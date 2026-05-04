@@ -57,7 +57,7 @@ def load_system_prompt(extra: str | None = None) -> str:
 
 
 def build_pipeline(
-    model: str = "claude-sonnet-4-6",
+    model: str = "claude-3-5-sonnet-20241022",
     max_tokens: int = 4096,
     extra_system_prompt: str | None = None,
 ) -> AgentPipeline:
@@ -78,7 +78,7 @@ def build_pipeline(
     client = anthropic.Anthropic()
     llm = AnthropicLLM(client=client, model=model, max_tokens=max_tokens)
 
-    return AgentPipeline(
+    pipeline = AgentPipeline(
         [
             InitQuery(),
             SystemMessage(system_prompt),
@@ -86,3 +86,7 @@ def build_pipeline(
             ToolsExecutionLoop([ToolsExecutor()]),
         ]
     )
+    # AgentDojo's attack constructors call get_model_name_from_pipeline(),
+    # which requires pipeline.name to contain a known model string.
+    pipeline.name = model
+    return pipeline

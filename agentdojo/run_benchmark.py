@@ -78,7 +78,7 @@ def run(args: argparse.Namespace) -> None:
             print(f"  Utility:  {utility:.1%}")
             all_utility.append(utility)
         else:
-            attack = ATTACKS[args.attack]()
+            attack = ATTACKS[args.attack](suite, pipeline)
             results = benchmark_suite_with_injections(
                 agent_pipeline=pipeline,
                 suite=suite,
@@ -144,8 +144,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--model",
-        default="claude-sonnet-4-6",
-        help="Claude model ID (default: claude-sonnet-4-6)",
+        default="claude-3-5-sonnet-20241022",
+        help="Claude model ID — must be one AgentDojo recognises (default: claude-3-5-sonnet-20241022)",
     )
     parser.add_argument(
         "--logdir",
