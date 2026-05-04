@@ -125,7 +125,7 @@ def _build_llm(provider: str, model: str, max_tokens: int):
         import openai
         from agentdojo.agent_pipeline import OpenAILLM
         client = openai.OpenAI()
-        return OpenAILLM(client=client, model=model, max_tokens=max_tokens)
+        return OpenAILLM(client=client, model=model)
 
     if provider == "nim":
         import os
@@ -135,6 +135,6 @@ def _build_llm(provider: str, model: str, max_tokens: int):
         if not api_key:
             raise ValueError("Set NIM_API_KEY or NVIDIA_API_KEY to use NVIDIA NIM")
         client = openai.OpenAI(base_url=NIM_BASE_URL, api_key=api_key)
-        return OpenAILLM(client=client, model=model, max_tokens=max_tokens)
+        return OpenAILLM(client=client, model=model)
 
     raise ValueError(f"Unknown provider '{provider}'. Choose: anthropic, google, openai, nim")
