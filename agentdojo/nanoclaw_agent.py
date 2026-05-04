@@ -45,8 +45,7 @@ DEFAULT_MODELS = {
     "anthropic": "claude-3-5-sonnet-20241022",
     "google": "gemini-2.0-flash-001",
     "openai": "gpt-4o-mini-2024-07-18",
-    # meta-llama/Llama-3-70b-chat-hf is in AgentDojo's allowlist
-    "nim": "meta-llama/Llama-3-70b-chat-hf",
+    "nim": "meta/llama-3.1-70b-instruct",
 }
 
 NIM_BASE_URL = "https://integrate.api.nvidia.com/v1"
@@ -103,8 +102,10 @@ def build_pipeline(
         ]
     )
     # AgentDojo's attack constructors call get_model_name_from_pipeline(),
-    # which requires pipeline.name to contain a known model string.
-    pipeline.name = model
+    # which requires pipeline.name to contain a key from its MODEL_NAMES allowlist.
+    # NIM model IDs (e.g. meta/llama-3.1-70b-instruct) don't match any allowlist
+    # entry, so we use "local" which is a valid catch-all in the allowlist.
+    pipeline.name = model if provider != "nim" else "local"
     return pipeline
 
 
