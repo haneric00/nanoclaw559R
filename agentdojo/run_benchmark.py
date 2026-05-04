@@ -40,6 +40,7 @@ from agentdojo.benchmark import (
     benchmark_suite_without_injections,
     get_suite,
 )
+from agentdojo.logging import OutputLogger
 
 from nanoclaw_agent import build_pipeline
 
@@ -69,33 +70,37 @@ def run(args: argparse.Namespace) -> None:
         print(f"Suite: {suite_name}  (version {args.benchmark_version})")
         print("=" * 60)
 
-        if args.no_injection:
-            results: SuiteResults = benchmark_suite_without_injections(
-                agent_pipeline=pipeline,
-                suite=suite,
-                logdir=logdir / suite_name,
-                force_rerun=args.force_rerun,
-                benchmark_version=args.benchmark_version,
-            )
-            utility = _score(results["utility_results"])
-            print(f"  Utility:  {utility:.1%}")
-            all_utility.append(utility)
-        else:
-            attack = ATTACKS[args.attack](suite, pipeline)
-            results = benchmark_suite_with_injections(
-                agent_pipeline=pipeline,
-                suite=suite,
-                attack=attack,
-                logdir=logdir / suite_name,
-                force_rerun=args.force_rerun,
-                benchmark_version=args.benchmark_version,
-            )
-            utility = _score(results["utility_results"])
-            security = _score(results["security_results"])
-            print(f"  Utility:  {utility:.1%}")
-            print(f"  Security: {security:.1%}")
-            all_utility.append(utility)
-            all_security.append(security)
+        suite_logdir = logdir / suite_name
+        suite_logdir.mkdir(parents=True, exist_ok=True)
+
+        with OutputLogger(logdir=str(suite_logdir)):
+            if args.no_injection:
+                results: SuiteResults = benchmark_suite_without_injections(
+                    agent_pipeline=pipeline,
+                    suite=suite,
+                    logdir=suite_logdir,
+                    force_rerun=args.force_rerun,
+                    benchmark_version=args.benchmark_version,
+                )
+                utility = _score(results["utility_results"])
+                print(f"  Utility:  {utility:.1%}")
+                all_utility.append(utility)
+            else:
+                attack = ATTACKS[args.attack](suite, pipeline)
+                results = benchmark_suite_with_injections(
+                    agent_pipeline=pipeline,
+                    suite=suite,
+                    attack=attack,
+                    logdir=suite_logdir,
+                    force_rerun=args.force_rerun,
+                    benchmark_version=args.benchmark_version,
+                )
+                utility = _score(results["utility_results"])
+                security = _score(results["security_results"])
+                print(f"  Utility:  {utility:.1%}")
+                print(f"  Security: {security:.1%}")
+                all_utility.append(utility)
+                all_security.append(security)
 
     print(f"\n{'='*60}")
     print("OVERALL")
