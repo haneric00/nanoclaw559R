@@ -45,7 +45,7 @@ DEFAULT_MODELS = {
     "anthropic": "claude-3-5-sonnet-20241022",
     "google": "gemini-2.0-flash-001",
     "openai": "gpt-4o-mini-2024-07-18",
-    "nim": "meta/llama-3.1-70b-instruct",
+    "nim": "meta/llama-3.3-70b-instruct",
 }
 
 NIM_BASE_URL = "https://integrate.api.nvidia.com/v1"
